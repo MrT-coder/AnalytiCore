@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://analyticore-python-service.onrender.com';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://analyticore-frontend.onrender.com';
 
 function App() {
   // Estados para el formulario de envío
