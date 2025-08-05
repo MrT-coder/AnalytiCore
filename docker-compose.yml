@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: analyticore
+      POSTGRES_USER: analyticore
+      POSTGRES_PASSWORD: analyticore123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U analyticore"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Servicio de análisis Java
+  java-service:
+    build: ./java-service
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/analyticore
+      DATABASE_USERNAME: analyticore
+      DATABASE_PASSWORD: analyticore123
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  # Servicio de submisión Python
+  python-service:
+    build: ./python-service
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://analyticore:analyticore123@postgres:5432/analyticore
+      JAVA_SERVICE_URL: http://java-service:8080
+    depends_on:
+      - postgres
+      - java-service
+    restart: unless-stopped
+
+  # Frontend React
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    environment:
+      REACT_APP_API_URL: http://localhost:5000
+    depends_on:
+      - python-service
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
