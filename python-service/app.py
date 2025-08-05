@@ -22,8 +22,8 @@ CORS(app,
 )
 
 # Configuración de base de datos
-DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://localhost:5432/analyticore')
-JAVA_SERVICE_URL = os.getenv('JAVA_SERVICE_URL', 'http://localhost:8080')
+DATABASE_URL = os.getenv('DATABASE_URL')
+JAVA_SERVICE_URL = os.getenv('JAVA_SERVICE_URL')
 
 # Agregar headers CORS a todas las respuestas
 @app.after_request
