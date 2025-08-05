@@ -12,11 +12,26 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app)
+
+# Configuración CORS más permisiva para producción
+CORS(app, 
+     origins=["*"],  # Permitir todos los orígenes
+     methods=['GET', 'POST', 'DELETE', 'OPTIONS'],
+     allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'],
+     supports_credentials=False
+)
 
 # Configuración de base de datos
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://localhost:5432/analyticore')
 JAVA_SERVICE_URL = os.getenv('JAVA_SERVICE_URL', 'http://localhost:8080')
+
+# Agregar headers CORS a todas las respuestas
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
+    return response
 
 def get_db_connection():
     """Crear conexión a la base de datos"""
